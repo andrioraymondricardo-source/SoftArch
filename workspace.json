@@ -1,0 +1,363 @@
+{
+  "configuration" : { },
+  "description" : "C4 model for the Event Management and Ticketing System",
+  "documentation" : { },
+  "id" : 1,
+  "lastModifiedDate" : "2026-09-26T08:12:46Z",
+  "model" : {
+    "people" : [ {
+      "description" : "Creates and manages events, ticketing, pricing, promotions, sales, and analytics.",
+      "id" : "1",
+      "name" : "Event Organiser",
+      "properties" : {
+        "structurizr.dsl.identifier" : "eventOrganiser"
+      },
+      "relationships" : [ {
+        "description" : "Creates and manages events, ticketing, pricing, promotions, sales, and analytics",
+        "destinationId" : "7",
+        "id" : "12",
+        "sourceId" : "1",
+        "tags" : "Relationship"
+      }, {
+        "description" : "Manages events, ticketing, pricing, promotions, and analytics using",
+        "destinationId" : "8",
+        "id" : "18",
+        "sourceId" : "1",
+        "tags" : "Relationship",
+        "technology" : "HTTPS"
+      } ],
+      "tags" : "Element,Person"
+    }, {
+      "description" : "Browses events, purchases tickets securely, and accesses purchased digital tickets.",
+      "id" : "2",
+      "name" : "Ticket Buyer / Attendee",
+      "properties" : {
+        "structurizr.dsl.identifier" : "ticketBuyer"
+      },
+      "relationships" : [ {
+        "description" : "Browses events, purchases tickets, and accesses digital tickets",
+        "destinationId" : "7",
+        "id" : "13",
+        "sourceId" : "2",
+        "tags" : "Relationship"
+      }, {
+        "description" : "Browses events and purchases and accesses tickets using",
+        "destinationId" : "8",
+        "id" : "19",
+        "sourceId" : "2",
+        "tags" : "Relationship",
+        "technology" : "HTTPS"
+      } ],
+      "tags" : "Element,Person"
+    }, {
+      "description" : "Uses the mobile application to scan tickets, validate entry, and manage attendee admission.",
+      "id" : "3",
+      "name" : "Event Staff",
+      "properties" : {
+        "structurizr.dsl.identifier" : "eventStaff"
+      },
+      "relationships" : [ {
+        "description" : "Scans and validates tickets and manages attendee admission",
+        "destinationId" : "7",
+        "id" : "14",
+        "sourceId" : "3",
+        "tags" : "Relationship"
+      }, {
+        "description" : "Scans tickets and manages attendee admission using",
+        "destinationId" : "9",
+        "id" : "21",
+        "sourceId" : "3",
+        "tags" : "Relationship",
+        "technology" : "HTTPS"
+      } ],
+      "tags" : "Element,Person"
+    }, {
+      "description" : "Monitors core system services and investigates suspicious ticket or payment activity.",
+      "id" : "4",
+      "name" : "Administrator",
+      "properties" : {
+        "structurizr.dsl.identifier" : "administrator"
+      },
+      "relationships" : [ {
+        "description" : "Monitors system operations and investigates suspicious activity",
+        "destinationId" : "7",
+        "id" : "15",
+        "sourceId" : "4",
+        "tags" : "Relationship"
+      }, {
+        "description" : "Monitors system operations and suspicious activity using",
+        "destinationId" : "8",
+        "id" : "20",
+        "sourceId" : "4",
+        "tags" : "Relationship",
+        "technology" : "HTTPS"
+      } ],
+      "tags" : "Element,Person"
+    } ],
+    "softwareSystems" : [ {
+      "description" : "Processes ticket payments securely and returns payment status and transaction confirmation.",
+      "documentation" : { },
+      "id" : "5",
+      "name" : "Payment Provider",
+      "properties" : {
+        "structurizr.dsl.identifier" : "paymentProvider"
+      },
+      "tags" : "Element,Software System"
+    }, {
+      "description" : "Supports event promotion through external social media platforms.",
+      "documentation" : { },
+      "id" : "6",
+      "name" : "Social Media Service",
+      "properties" : {
+        "structurizr.dsl.identifier" : "socialMediaService"
+      },
+      "tags" : "Element,Software System"
+    }, {
+      "containers" : [ {
+        "description" : "Provides the user interface for event management, event browsing, ticket purchasing, and administration.",
+        "documentation" : { },
+        "id" : "8",
+        "name" : "Web Application",
+        "properties" : {
+          "structurizr.dsl.identifier" : "webApplication"
+        },
+        "relationships" : [ {
+          "description" : "Makes API requests to",
+          "destinationId" : "10",
+          "id" : "22",
+          "sourceId" : "8",
+          "tags" : "Relationship",
+          "technology" : "REST/HTTPS"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Web Application"
+      }, {
+        "description" : "Supports ticket scanning and attendee admission management during events.",
+        "documentation" : { },
+        "id" : "9",
+        "name" : "Mobile Application",
+        "properties" : {
+          "structurizr.dsl.identifier" : "mobileApplication"
+        },
+        "relationships" : [ {
+          "description" : "Makes ticket validation and admission requests to",
+          "destinationId" : "10",
+          "id" : "23",
+          "sourceId" : "9",
+          "tags" : "Relationship",
+          "technology" : "REST/HTTPS"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Mobile Application"
+      }, {
+        "description" : "Executes business logic for event management, ticket purchasing, pricing and promotions, capacity management, payments, ticket validation, and analytics.",
+        "documentation" : { },
+        "id" : "10",
+        "name" : "Backend API",
+        "properties" : {
+          "structurizr.dsl.identifier" : "backendApi"
+        },
+        "relationships" : [ {
+          "description" : "Reads and writes event, ticket, capacity, payment, and attendee data",
+          "destinationId" : "11",
+          "id" : "24",
+          "sourceId" : "10",
+          "tags" : "Relationship",
+          "technology" : "Transactional database access"
+        }, {
+          "description" : "Sends payment requests and receives payment status from",
+          "destinationId" : "5",
+          "id" : "25",
+          "sourceId" : "10",
+          "tags" : "Relationship",
+          "technology" : "External API/HTTPS"
+        }, {
+          "description" : "Sends event and promotional content to",
+          "destinationId" : "6",
+          "id" : "26",
+          "sourceId" : "10",
+          "tags" : "Relationship",
+          "technology" : "External API/HTTPS"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Application / API"
+      }, {
+        "description" : "Stores persistent system data and maintains consistent ticket, capacity, and transaction states.",
+        "documentation" : { },
+        "id" : "11",
+        "name" : "EMS Database",
+        "properties" : {
+          "structurizr.dsl.identifier" : "emsDatabase"
+        },
+        "tags" : "Element,Container",
+        "technology" : "Relational Database"
+      } ],
+      "description" : "Supports event creation, promotion, ticketing, payment, analytics, ticket scanning, and attendee management.",
+      "documentation" : { },
+      "id" : "7",
+      "name" : "Event Management and Ticketing System",
+      "properties" : {
+        "structurizr.dsl.identifier" : "ems"
+      },
+      "relationships" : [ {
+        "description" : "Processes ticket payments using",
+        "destinationId" : "5",
+        "id" : "16",
+        "sourceId" : "7",
+        "tags" : "Relationship"
+      }, {
+        "description" : "Publishes event promotional content using",
+        "destinationId" : "6",
+        "id" : "17",
+        "sourceId" : "7",
+        "tags" : "Relationship"
+      } ],
+      "tags" : "Element,Software System"
+    } ]
+  },
+  "name" : "Event Management and Ticketing System",
+  "properties" : {
+    "structurizr.inspection.error" : "9",
+    "structurizr.dsl" : "d29ya3NwYWNlICJFdmVudCBNYW5hZ2VtZW50IGFuZCBUaWNrZXRpbmcgU3lzdGVtIiAiQzQgbW9kZWwgZm9yIHRoZSBFdmVudCBNYW5hZ2VtZW50IGFuZCBUaWNrZXRpbmcgU3lzdGVtIiB7CgogICAgbW9kZWwgewoKICAgICAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAgICAgICAvLyBQZW9wbGUKICAgICAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KCiAgICAgICAgZXZlbnRPcmdhbmlzZXIgPSBwZXJzb24gIkV2ZW50IE9yZ2FuaXNlciIgewogICAgICAgICAgICBkZXNjcmlwdGlvbiAiQ3JlYXRlcyBhbmQgbWFuYWdlcyBldmVudHMsIHRpY2tldGluZywgcHJpY2luZywgcHJvbW90aW9ucywgc2FsZXMsIGFuZCBhbmFseXRpY3MuIgogICAgICAgIH0KCiAgICAgICAgdGlja2V0QnV5ZXIgPSBwZXJzb24gIlRpY2tldCBCdXllciAvIEF0dGVuZGVlIiB7CiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJCcm93c2VzIGV2ZW50cywgcHVyY2hhc2VzIHRpY2tldHMgc2VjdXJlbHksIGFuZCBhY2Nlc3NlcyBwdXJjaGFzZWQgZGlnaXRhbCB0aWNrZXRzLiIKICAgICAgICB9CgogICAgICAgIGV2ZW50U3RhZmYgPSBwZXJzb24gIkV2ZW50IFN0YWZmIiB7CiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJVc2VzIHRoZSBtb2JpbGUgYXBwbGljYXRpb24gdG8gc2NhbiB0aWNrZXRzLCB2YWxpZGF0ZSBlbnRyeSwgYW5kIG1hbmFnZSBhdHRlbmRlZSBhZG1pc3Npb24uIgogICAgICAgIH0KCiAgICAgICAgYWRtaW5pc3RyYXRvciA9IHBlcnNvbiAiQWRtaW5pc3RyYXRvciIgewogICAgICAgICAgICBkZXNjcmlwdGlvbiAiTW9uaXRvcnMgY29yZSBzeXN0ZW0gc2VydmljZXMgYW5kIGludmVzdGlnYXRlcyBzdXNwaWNpb3VzIHRpY2tldCBvciBwYXltZW50IGFjdGl2aXR5LiIKICAgICAgICB9CgoKICAgICAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAgICAgICAvLyBFeHRlcm5hbCBTeXN0ZW1zCiAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CgogICAgICAgIHBheW1lbnRQcm92aWRlciA9IHNvZnR3YXJlU3lzdGVtICJQYXltZW50IFByb3ZpZGVyIiB7CiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJQcm9jZXNzZXMgdGlja2V0IHBheW1lbnRzIHNlY3VyZWx5IGFuZCByZXR1cm5zIHBheW1lbnQgc3RhdHVzIGFuZCB0cmFuc2FjdGlvbiBjb25maXJtYXRpb24uIgogICAgICAgIH0KCiAgICAgICAgc29jaWFsTWVkaWFTZXJ2aWNlID0gc29mdHdhcmVTeXN0ZW0gIlNvY2lhbCBNZWRpYSBTZXJ2aWNlIiB7CiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJTdXBwb3J0cyBldmVudCBwcm9tb3Rpb24gdGhyb3VnaCBleHRlcm5hbCBzb2NpYWwgbWVkaWEgcGxhdGZvcm1zLiIKICAgICAgICB9CgoKICAgICAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAgICAgICAvLyBFdmVudCBNYW5hZ2VtZW50IGFuZCBUaWNrZXRpbmcgU3lzdGVtCiAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CgogICAgICAgIGVtcyA9IHNvZnR3YXJlU3lzdGVtICJFdmVudCBNYW5hZ2VtZW50IGFuZCBUaWNrZXRpbmcgU3lzdGVtIiB7CiAgICAgICAgICAgIGRlc2NyaXB0aW9uICJTdXBwb3J0cyBldmVudCBjcmVhdGlvbiwgcHJvbW90aW9uLCB0aWNrZXRpbmcsIHBheW1lbnQsIGFuYWx5dGljcywgdGlja2V0IHNjYW5uaW5nLCBhbmQgYXR0ZW5kZWUgbWFuYWdlbWVudC4iCgogICAgICAgICAgICAvLyAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogICAgICAgICAgICAvLyBDNCBMZXZlbCAyIENvbnRhaW5lcnMKICAgICAgICAgICAgLy8gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KCiAgICAgICAgICAgIHdlYkFwcGxpY2F0aW9uID0gY29udGFpbmVyICJXZWIgQXBwbGljYXRpb24iIHsKICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJQcm92aWRlcyB0aGUgdXNlciBpbnRlcmZhY2UgZm9yIGV2ZW50IG1hbmFnZW1lbnQsIGV2ZW50IGJyb3dzaW5nLCB0aWNrZXQgcHVyY2hhc2luZywgYW5kIGFkbWluaXN0cmF0aW9uLiIKICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIldlYiBBcHBsaWNhdGlvbiIKICAgICAgICAgICAgfQoKICAgICAgICAgICAgbW9iaWxlQXBwbGljYXRpb24gPSBjb250YWluZXIgIk1vYmlsZSBBcHBsaWNhdGlvbiIgewogICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlN1cHBvcnRzIHRpY2tldCBzY2FubmluZyBhbmQgYXR0ZW5kZWUgYWRtaXNzaW9uIG1hbmFnZW1lbnQgZHVyaW5nIGV2ZW50cy4iCiAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJNb2JpbGUgQXBwbGljYXRpb24iCiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIGJhY2tlbmRBcGkgPSBjb250YWluZXIgIkJhY2tlbmQgQVBJIiB7CiAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiRXhlY3V0ZXMgYnVzaW5lc3MgbG9naWMgZm9yIGV2ZW50IG1hbmFnZW1lbnQsIHRpY2tldCBwdXJjaGFzaW5nLCBwcmljaW5nIGFuZCBwcm9tb3Rpb25zLCBjYXBhY2l0eSBtYW5hZ2VtZW50LCBwYXltZW50cywgdGlja2V0IHZhbGlkYXRpb24sIGFuZCBhbmFseXRpY3MuIgogICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiQXBwbGljYXRpb24gLyBBUEkiCiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIGVtc0RhdGFiYXNlID0gY29udGFpbmVyICJFTVMgRGF0YWJhc2UiIHsKICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJTdG9yZXMgcGVyc2lzdGVudCBzeXN0ZW0gZGF0YSBhbmQgbWFpbnRhaW5zIGNvbnNpc3RlbnQgdGlja2V0LCBjYXBhY2l0eSwgYW5kIHRyYW5zYWN0aW9uIHN0YXRlcy4iCiAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJSZWxhdGlvbmFsIERhdGFiYXNlIgogICAgICAgICAgICB9CiAgICAgICAgfQoKCiAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAgICAgICAgLy8gUmVsYXRpb25zaGlwcyAtIFBlb3BsZSB0byBFTVMKICAgICAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KCiAgICAgICAgZXZlbnRPcmdhbmlzZXIgLT4gZW1zICJDcmVhdGVzIGFuZCBtYW5hZ2VzIGV2ZW50cywgdGlja2V0aW5nLCBwcmljaW5nLCBwcm9tb3Rpb25zLCBzYWxlcywgYW5kIGFuYWx5dGljcyIKCiAgICAgICAgdGlja2V0QnV5ZXIgLT4gZW1zICJCcm93c2VzIGV2ZW50cywgcHVyY2hhc2VzIHRpY2tldHMsIGFuZCBhY2Nlc3NlcyBkaWdpdGFsIHRpY2tldHMiCgogICAgICAgIGV2ZW50U3RhZmYgLT4gZW1zICJTY2FucyBhbmQgdmFsaWRhdGVzIHRpY2tldHMgYW5kIG1hbmFnZXMgYXR0ZW5kZWUgYWRtaXNzaW9uIgoKICAgICAgICBhZG1pbmlzdHJhdG9yIC0+IGVtcyAiTW9uaXRvcnMgc3lzdGVtIG9wZXJhdGlvbnMgYW5kIGludmVzdGlnYXRlcyBzdXNwaWNpb3VzIGFjdGl2aXR5IgoKCiAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAgICAgICAgLy8gUmVsYXRpb25zaGlwcyAtIEVNUyB0byBFeHRlcm5hbCBTeXN0ZW1zCiAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CgogICAgICAgIGVtcyAtPiBwYXltZW50UHJvdmlkZXIgIlByb2Nlc3NlcyB0aWNrZXQgcGF5bWVudHMgdXNpbmciCgogICAgICAgIGVtcyAtPiBzb2NpYWxNZWRpYVNlcnZpY2UgIlB1Ymxpc2hlcyBldmVudCBwcm9tb3Rpb25hbCBjb250ZW50IHVzaW5nIgoKCiAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAgICAgICAgLy8gTGV2ZWwgMiBSZWxhdGlvbnNoaXBzIC0gUGVvcGxlIHRvIENvbnRhaW5lcnMKICAgICAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KCiAgICAgICAgZXZlbnRPcmdhbmlzZXIgLT4gd2ViQXBwbGljYXRpb24gIk1hbmFnZXMgZXZlbnRzLCB0aWNrZXRpbmcsIHByaWNpbmcsIHByb21vdGlvbnMsIGFuZCBhbmFseXRpY3MgdXNpbmciICJIVFRQUyIKCiAgICAgICAgdGlja2V0QnV5ZXIgLT4gd2ViQXBwbGljYXRpb24gIkJyb3dzZXMgZXZlbnRzIGFuZCBwdXJjaGFzZXMgYW5kIGFjY2Vzc2VzIHRpY2tldHMgdXNpbmciICJIVFRQUyIKCiAgICAgICAgYWRtaW5pc3RyYXRvciAtPiB3ZWJBcHBsaWNhdGlvbiAiTW9uaXRvcnMgc3lzdGVtIG9wZXJhdGlvbnMgYW5kIHN1c3BpY2lvdXMgYWN0aXZpdHkgdXNpbmciICJIVFRQUyIKCiAgICAgICAgZXZlbnRTdGFmZiAtPiBtb2JpbGVBcHBsaWNhdGlvbiAiU2NhbnMgdGlja2V0cyBhbmQgbWFuYWdlcyBhdHRlbmRlZSBhZG1pc3Npb24gdXNpbmciICJIVFRQUyIKCgogICAgICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQogICAgICAgIC8vIExldmVsIDIgUmVsYXRpb25zaGlwcyAtIENvbnRhaW5lcnMKICAgICAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KCiAgICAgICAgd2ViQXBwbGljYXRpb24gLT4gYmFja2VuZEFwaSAiTWFrZXMgQVBJIHJlcXVlc3RzIHRvIiAiUkVTVC9IVFRQUyIKCiAgICAgICAgbW9iaWxlQXBwbGljYXRpb24gLT4gYmFja2VuZEFwaSAiTWFrZXMgdGlja2V0IHZhbGlkYXRpb24gYW5kIGFkbWlzc2lvbiByZXF1ZXN0cyB0byIgIlJFU1QvSFRUUFMiCgogICAgICAgIGJhY2tlbmRBcGkgLT4gZW1zRGF0YWJhc2UgIlJlYWRzIGFuZCB3cml0ZXMgZXZlbnQsIHRpY2tldCwgY2FwYWNpdHksIHBheW1lbnQsIGFuZCBhdHRlbmRlZSBkYXRhIiAiVHJhbnNhY3Rpb25hbCBkYXRhYmFzZSBhY2Nlc3MiCgoKICAgICAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICAgICAgICAvLyBMZXZlbCAyIFJlbGF0aW9uc2hpcHMgLSBFeHRlcm5hbCBTeXN0ZW1zCiAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CgogICAgICAgIGJhY2tlbmRBcGkgLT4gcGF5bWVudFByb3ZpZGVyICJTZW5kcyBwYXltZW50IHJlcXVlc3RzIGFuZCByZWNlaXZlcyBwYXltZW50IHN0YXR1cyBmcm9tIiAiRXh0ZXJuYWwgQVBJL0hUVFBTIgoKICAgICAgICBiYWNrZW5kQXBpIC0+IHNvY2lhbE1lZGlhU2VydmljZSAiU2VuZHMgZXZlbnQgYW5kIHByb21vdGlvbmFsIGNvbnRlbnQgdG8iICJFeHRlcm5hbCBBUEkvSFRUUFMiCiAgICB9CgoKICAgIHZpZXdzIHsKCiAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAgICAgICAgLy8gQzQgTGV2ZWwgMSAtIFN5c3RlbSBDb250ZXh0CiAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CgogICAgICAgIHN5c3RlbUNvbnRleHQgZW1zICJTeXN0ZW1Db250ZXh0IiB7CiAgICAgICAgICAgIGluY2x1ZGUgZXZlbnRPcmdhbmlzZXIKICAgICAgICAgICAgaW5jbHVkZSB0aWNrZXRCdXllcgogICAgICAgICAgICBpbmNsdWRlIGV2ZW50U3RhZmYKICAgICAgICAgICAgaW5jbHVkZSBhZG1pbmlzdHJhdG9yCiAgICAgICAgICAgIGluY2x1ZGUgZW1zCiAgICAgICAgICAgIGluY2x1ZGUgcGF5bWVudFByb3ZpZGVyCiAgICAgICAgICAgIGluY2x1ZGUgc29jaWFsTWVkaWFTZXJ2aWNlCgogICAgICAgICAgICBhdXRvTGF5b3V0CiAgICAgICAgfQoKCiAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAgICAgICAgLy8gQzQgTGV2ZWwgMiAtIENvbnRhaW5lcgogICAgICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQoKICAgICAgICBjb250YWluZXIgZW1zICJDb250YWluZXIiIHsKICAgICAgICAgICAgaW5jbHVkZSBldmVudE9yZ2FuaXNlcgogICAgICAgICAgICBpbmNsdWRlIHRpY2tldEJ1eWVyCiAgICAgICAgICAgIGluY2x1ZGUgZXZlbnRTdGFmZgogICAgICAgICAgICBpbmNsdWRlIGFkbWluaXN0cmF0b3IKCiAgICAgICAgICAgIGluY2x1ZGUgd2ViQXBwbGljYXRpb24KICAgICAgICAgICAgaW5jbHVkZSBtb2JpbGVBcHBsaWNhdGlvbgogICAgICAgICAgICBpbmNsdWRlIGJhY2tlbmRBcGkKICAgICAgICAgICAgaW5jbHVkZSBlbXNEYXRhYmFzZQoKICAgICAgICAgICAgaW5jbHVkZSBwYXltZW50UHJvdmlkZXIKICAgICAgICAgICAgaW5jbHVkZSBzb2NpYWxNZWRpYVNlcnZpY2UKCiAgICAgICAgICAgIGF1dG9MYXlvdXQKICAgICAgICB9CgogICAgICAgIHRoZW1lIGRlZmF1bHQKICAgIH0KfQ==",
+    "structurizr.inspection.info" : "0",
+    "structurizr.inspection.ignore" : "0",
+    "structurizr.inspection.warning" : "0"
+  },
+  "views" : {
+    "configuration" : {
+      "styles" : { },
+      "terminology" : { },
+      "themes" : [ "https://static.structurizr.com/themes/default/theme.json" ]
+    },
+    "containerViews" : [ {
+      "automaticLayout" : {
+        "edgeSeparation" : 50,
+        "nodeSeparation" : 50,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 100,
+        "vertices" : true
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "2",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "3",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "4",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "5",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "6",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "8",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "9",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "10",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "11",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "Container",
+      "name" : "Container View: Event Management and Ticketing System",
+      "order" : 2,
+      "relationships" : [ {
+        "id" : "18"
+      }, {
+        "id" : "19"
+      }, {
+        "id" : "20"
+      }, {
+        "id" : "21"
+      }, {
+        "id" : "22"
+      }, {
+        "id" : "23"
+      }, {
+        "id" : "24"
+      }, {
+        "id" : "25"
+      }, {
+        "id" : "26"
+      } ],
+      "softwareSystemId" : "7"
+    } ],
+    "systemContextViews" : [ {
+      "automaticLayout" : {
+        "edgeSeparation" : 50,
+        "nodeSeparation" : 50,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 100,
+        "vertices" : true
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "2",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "3",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "4",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "5",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "6",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "7",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "enterpriseBoundaryVisible" : true,
+      "key" : "SystemContext",
+      "name" : "System Context View: Event Management and Ticketing System",
+      "order" : 1,
+      "relationships" : [ {
+        "id" : "12"
+      }, {
+        "id" : "13"
+      }, {
+        "id" : "14"
+      }, {
+        "id" : "15"
+      }, {
+        "id" : "16"
+      }, {
+        "id" : "17"
+      } ],
+      "softwareSystemId" : "7"
+    } ]
+  }
+}
