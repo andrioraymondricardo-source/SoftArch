@@ -49,7 +49,7 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
             // =====================================================
 
             webApplication = container "Web Application" {
-                description "Provides the user interface for event management, event browsing, ticket purchasing, and administration."
+                description "Provides the user interface for event page creation, multimedia content management, event browsing, ticket purchasing, promotions, analytics, and administration."
                 technology "Web Application"
 
 
@@ -91,6 +91,12 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
                     description "Encapsulates communication between web user-interface components and the Backend API."
                     technology "REST/HTTPS Client"
                 }
+
+                eventPageContentUI = component "Event Page Content UI" {
+                    description "Allows event organisers to manage customisable event page content and multimedia elements."
+                    technology "Web UI Component"
+                }
+
             }
 
 
@@ -143,7 +149,7 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
                 // -------------------------------------------------
 
                 eventManagementComponent = component "Event Management Component" {
-                    description "Manages event creation, updates, ticket types, and event configuration."
+                    description "Manages event creation,customisable event pages ,updates, multimedia content, ticket types, and event configuration."
                     technology "Application Component"
                 }
 
@@ -245,10 +251,12 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
 
         eventOrganiser -> eventManagementUI "Creates and manages events using"
 
+        eventOrganiser -> eventPageContentUI "Manages event page content and multimedia elements using"
+
         eventOrganiser -> promotionManagementUI "Manages pricing and promotions using"
 
         eventOrganiser -> analyticsDashboard "Views event analytics using"
-
+        
         administrator -> administrationUI "Monitors system operations using"
 
         eventBrowsingUI -> webApiClient "Requests event and ticket information through"
@@ -257,10 +265,12 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
 
         eventManagementUI -> webApiClient "Submits event management requests through"
 
+        eventPageContentUI -> webApiClient "Submits event page content and multimedia management requests through"
+
         promotionManagementUI -> webApiClient "Submits pricing and promotion requests through"
 
         analyticsDashboard -> webApiClient "Requests analytics data through"
-
+        
         administrationUI -> webApiClient "Requests monitoring and investigation data through"
 
         webApiClient -> backendApi "Makes API requests to" "REST/HTTPS"
@@ -376,6 +386,7 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
             include eventBrowsingUI
             include ticketPurchaseUI
             include eventManagementUI
+            include eventPageContentUI
             include promotionManagementUI
             include analyticsDashboard
             include administrationUI
