@@ -440,7 +440,6 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
             include paymentProvider
             include socialMediaService
 
-            autoLayout lr
         }
 
 
