@@ -72,6 +72,11 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
                     technology "Web UI Component"
                 }
 
+                eventPageContentUI = component "Event Page Content UI" {
+                    description "Allows event organisers to manage customisable event page content and multimedia elements."
+                    technology "Web UI Component"
+                }
+
                 promotionManagementUI = component "Pricing & Promotion UI" {
                     description "Allows event organisers to manage ticket pricing, pricing tiers, promotional rules, discounts, and promotional content."
                     technology "Web UI Component"
@@ -90,11 +95,6 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
                 webApiClient = component "Backend API Client" {
                     description "Encapsulates communication between web user-interface components and the Backend API."
                     technology "REST/HTTPS Client"
-                }
-
-                eventPageContentUI = component "Event Page Content UI" {
-                    description "Allows event organisers to manage customisable event page content and multimedia elements."
-                    technology "Web UI Component"
                 }
 
             }
@@ -149,7 +149,7 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
                 // -------------------------------------------------
 
                 eventManagementComponent = component "Event Management Component" {
-                    description "Manages event creation,customisable event pages ,updates, multimedia content, ticket types, and event configuration."
+                    description "Manages event creation, customisable event pages, multimedia content, updates, ticket types, and event configuration."
                     technology "Application Component"
                 }
 
@@ -205,7 +205,7 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
         // LEVEL 1 RELATIONSHIPS
         // =========================================================
 
-        eventOrganiser -> ems "Creates and manages events, ticketing, pricing, promotions, sales, and analytics"
+        eventOrganiser -> ems "Creates and manages events, event pages, multimedia content, ticketing, pricing, promotions, sales, and analytics"
 
         ticketBuyer -> ems "Browses events, purchases tickets, and accesses digital tickets"
 
@@ -222,7 +222,7 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
         // LEVEL 2 RELATIONSHIPS
         // =========================================================
 
-        eventOrganiser -> webApplication "Manages events, ticketing, pricing, promotions, and analytics using" "HTTPS"
+        eventOrganiser -> webApplication "Manages events, event pages, multimedia content, ticketing, pricing, promotions, and analytics using" "HTTPS"
 
         ticketBuyer -> webApplication "Browses events and purchases and accesses tickets using" "HTTPS"
 
@@ -297,7 +297,7 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
         // LEVEL 3 RELATIONSHIPS - BACKEND API
         // =========================================================
 
-        eventManagementComponent -> emsDatabase "Reads and writes event and configuration data" "Transactional database access"
+        eventManagementComponent -> emsDatabase "Reads and writes event, event page, multimedia content, and configuration data" "Transactional database access"
 
         pricingPromotionComponent -> emsDatabase "Reads and writes pricing, discount, and promotion data" "Transactional database access"
 
@@ -314,6 +314,8 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
         capacityReservationComponent -> emsDatabase "Checks and updates ticket capacity and reservation state" "Transactional database access"
 
         paymentProcessingComponent -> paymentProvider "Sends secure payment requests and receives payment status" "External API/HTTPS"
+
+        paymentProcessingComponent -> capacityReservationComponent "Confirms or releases reserved capacity based on payment result"
 
         paymentProcessingComponent -> emsDatabase "Records payment transaction status" "Transactional database access"
 
@@ -344,7 +346,7 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
             include paymentProvider
             include socialMediaService
 
-            autoLayout
+            autoLayout lr
         }
 
 
@@ -368,7 +370,7 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
             include paymentProvider
             include socialMediaService
 
-            autoLayout
+            autoLayout lr
         }
 
 
@@ -394,7 +396,7 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
 
             include backendApi
 
-            autoLayout
+            autoLayout lr
         }
 
 
@@ -414,7 +416,7 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
 
             include backendApi
 
-            autoLayout
+            autoLayout lr
         }
 
 
@@ -438,7 +440,7 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
             include paymentProvider
             include socialMediaService
 
-            autoLayout
+            autoLayout lr
         }
 
 

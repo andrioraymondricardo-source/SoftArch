@@ -19,5 +19,6 @@ docker run -it --rm \
   -p 9000:8080 \
   -v "$(pwd)":/usr/local/structurizr \
   structurizr/structurizr local
+  
 
 Then open localhost:9000 in a browser.
