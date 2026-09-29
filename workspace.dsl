@@ -187,6 +187,91 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
                     description "Supports operational monitoring and investigation of suspicious ticket or payment activity."
                     technology "Application Component"
                 }
+
+                    // -------------------------------------------------
+                    // LEVEL 4 - BACKEND API CODE ELEMENTS
+                    // -------------------------------------------------
+
+                    ticketManagementService = component "TicketManagementService" {
+                        description "Methods: purchaseTicket(), issueTicket(), handlePaymentResult()."
+                        technology "Service"
+                    }
+
+                    pricingPromotionService = component "PricingPromotionService" {
+                        description "Methods: calculatePrice(), applyPromotion(), publishPromotion()."
+                        technology "Service"
+                    }
+
+                    capacityReservationService = component "CapacityReservationService" {
+                        description "Methods: checkAvailability(), reserveCapacity(), confirmReservation(), releaseReservation()."
+                        technology "Service"
+                    }
+
+                    paymentProcessingService = component "PaymentProcessingService" {
+                        description "Methods: processPayment(), getPaymentStatus()."
+                        technology "Service"
+                    }
+
+                    ticketValidationServiceCode = component "TicketValidationService" {
+                        description "Methods: validateTicket(), markAdmitted()."
+                        technology "Service"
+                    }
+
+                    eventManagementService = component "EventManagementService" {
+                        description "Methods: createEvent(), updateEvent(), manageEventContent()."
+                        technology "Service"
+                    }
+
+                    analyticsService = component "AnalyticsService" {
+                        description "Methods: generateSalesReport(), generateAttendeeReport()."
+                        technology "Service"
+                    }
+
+                    administrationService = component "AdministrationService" {
+                        description "Methods: monitorOperations(), reviewSuspiciousActivity()."
+                        technology "Service"
+                    }
+
+                    emsRepository = component "EMSRepository" {
+                        description "Methods: saveEvent(), findTicket(), saveReservation(), updateCapacity(), savePayment(), updateTicketStatus()."
+                        technology "Interface"
+                    }
+
+                    paymentProviderGateway = component "PaymentProviderGateway" {
+                        description "Methods: requestPayment(), getPaymentStatus()."
+                        technology "Interface"
+                    }
+
+                    socialMediaGateway = component "SocialMediaGateway" {
+                        description "Methods: publishEventPromotion()."
+                        technology "Interface"
+                    }
+
+                    ticketEntity = component "Ticket" {
+                        description "Ticket entity with ticketId, ticketCode, and status."
+                        technology "Entity"
+                    }
+
+                    eventEntity = component "Event" {
+                        description "Event entity with eventId, name, and capacity."
+                        technology "Entity"
+                    }
+
+                    attendeeEntity = component "Attendee" {
+                        description "Attendee entity with attendeeId."
+                        technology "Entity"
+                    }
+
+                    paymentTransactionEntity = component "PaymentTransaction" {
+                        description "Payment transaction entity with transactionId and status."
+                        technology "Entity"
+                    }
+
+                    reservationEntity = component "Reservation" {
+                        description "Reservation entity with reservationId, status, and expiryTime."
+                        technology "Entity"
+                    }
+
             }
 
 
@@ -324,6 +409,47 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
         analyticsComponent -> emsDatabase "Reads sales, ticketing, and attendee data" "Database access"
 
         administrationComponent -> emsDatabase "Reads operational, ticket, and payment data for monitoring" "Database access"
+
+        // =========================================================
+        // LEVEL 4 RELATIONSHIPS - BACKEND API CODE DIAGRAM
+        // =========================================================
+
+        ticketManagementService -> pricingPromotionService "Obtains current price and promotion details from"
+
+        ticketManagementService -> capacityReservationService "Reserves capacity and confirms or releases reservations after payment result"
+
+        ticketManagementService -> paymentProcessingService "Requests payment processing from"
+
+        ticketManagementService -> emsRepository "Saves ticket and purchase data through"
+
+        pricingPromotionService -> emsRepository "Reads and writes pricing and promotion data through"
+
+        pricingPromotionService -> socialMediaGateway "Publishes promotional content through"
+
+        capacityReservationService -> emsRepository "Saves reservation state and updates capacity through"
+
+        paymentProcessingService -> paymentProviderGateway "Sends payment requests and retrieves payment status through"
+
+        paymentProcessingService -> emsRepository "Records payment transaction status through"
+
+        ticketValidationServiceCode -> emsRepository "Reads ticket status and updates admitted ticket status through"
+
+        eventManagementService -> emsRepository "Reads and writes event and event content data through"
+
+        analyticsService -> emsRepository "Reads sales, ticketing, and attendee data through"
+
+        administrationService -> emsRepository "Reads operational, ticket, and payment data through"
+
+        emsRepository -> ticketEntity "Persists"
+
+        emsRepository -> eventEntity "Persists"
+
+        emsRepository -> attendeeEntity "Persists"
+
+        emsRepository -> paymentTransactionEntity "Persists"
+
+        emsRepository -> reservationEntity "Persists"
+
     }
 
 
@@ -442,6 +568,35 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
 
         }
 
+        
+        // =========================================================
+        // DIAGRAM 6 - C4 LEVEL 4
+        // BACKEND API CODE DIAGRAM
+        // =========================================================
+
+        component backendApi "BackendCodeDiagram" {
+
+            include ticketManagementService
+            include pricingPromotionService
+            include capacityReservationService
+            include paymentProcessingService
+            include ticketValidationServiceCode
+            include eventManagementService
+            include analyticsService
+            include administrationService
+
+            include emsRepository
+            include paymentProviderGateway
+            include socialMediaGateway
+
+            include ticketEntity
+            include eventEntity
+            include attendeeEntity
+            include paymentTransactionEntity
+            include reservationEntity
+
+            autoLayout tb
+        }
 
         // =========================================================
         // THEME
