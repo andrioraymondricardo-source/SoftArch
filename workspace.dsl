@@ -285,6 +285,35 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
             }
         }
 
+        // =====================================================
+        // DATA MODEL - CONCEPTUAL
+        // =====================================================
+
+        cdmEvent = element "Event" "Conceptual Entity"
+        cdmTicketType = element "Ticket Type" "Conceptual Entity"
+        cdmPromotion = element "Promotion" "Conceptual Entity"
+        cdmTicket = element "Ticket" "Conceptual Entity"
+        cdmReservation = element "Reservation" "Conceptual Entity"
+        cdmPurchase = element "Purchase" "Conceptual Entity"
+        cdmPaymentTransaction = element "Payment Transaction" "Conceptual Entity"
+        cdmAttendee = element "Attendee" "Conceptual Entity"
+
+        // =====================================================
+        // CONCEPTUAL DATA RELATIONSHIPS
+        // =====================================================
+
+        cdmEvent -> cdmTicketType "1 to 0..*"
+        cdmEvent -> cdmPromotion "1 to 0..*"
+        cdmTicketType -> cdmTicket "1 to 0..*"
+        cdmTicketType -> cdmReservation "1 to 0..*"
+        cdmAttendee -> cdmReservation "1 to 0..*"
+        cdmPurchase -> cdmReservation "1 to 1"
+        cdmPurchase -> cdmPaymentTransaction "1 to 0..1"
+        cdmPurchase -> cdmTicket "1 to 0..*"
+
+
+
+
 
         // =========================================================
         // LEVEL 1 RELATIONSHIPS
@@ -599,6 +628,27 @@ workspace "Event Management and Ticketing System" "C4 model for the Event Manage
             include eventEntity
             include attendeeEntity
 
+        }
+
+
+        // =========================================================
+        // DIAGRAM 7
+        // CONCEPTUAL DATA MODEL
+        // =========================================================
+
+        custom "07-ConceptualDataModel" {
+            title "7.Conceptual Data Model"
+
+            include cdmEvent
+            include cdmTicketType
+            include cdmPromotion
+            include cdmTicket
+            include cdmReservation
+            include cdmPurchase
+            include cdmPaymentTransaction
+            include cdmAttendee
+
+            autoLayout tb
         }
 
 
