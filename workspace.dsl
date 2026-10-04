@@ -331,6 +331,11 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             tags "ConceptualEntity"
         }
 
+        cdmValidationAdmission = element "Validation / Admission" "Conceptual Entity" {
+            description "Represents ticket validation and attendee admission at event entry."
+            tags "ConceptualEntity"
+        }
+
 
         // =========================================================
         // CONCEPTUAL RELATIONSHIPS
@@ -342,11 +347,14 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         cdmTicketType -> cdmTicket "1 : 0..*"
         cdmTicketType -> cdmReservation "1 : 0..*"
 
-        cdmAttendee -> cdmReservation "1 : 0..*"
+        cdmAttendee -> cdmPurchase "1 : 0..*"
+        cdmAttendee -> cdmTicket "1 : 0..*"
 
-        cdmReservation -> cdmPurchase "1 : 0..1"
+        cdmPurchase -> cdmReservation "1 : 0..*"
         cdmPurchase -> cdmPaymentTransaction "1 : 0..1"
         cdmPurchase -> cdmTicket "1 : 0..*"
+
+        cdmTicket -> cdmValidationAdmission "1 : 0..*"
 
 
         // =========================================================
@@ -354,12 +362,12 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         // =========================================================
 
         ldmEvent = element "Event [Logical]" {
-            description "PK: event_id | event_name | event_content | event_capacity | remaining_capacity"
+            description "PK: event_id | event_name | event_content | event_capacity"
             tags "LogicalEntity"
         }
 
         ldmTicketType = element "Ticket Type [Logical]" {
-            description "PK: ticket_type_id | FK: event_id | ticket_type | ticket_price"
+            description "PK: ticket_type_id | FK: event_id | ticket_type_name | ticket_price | remaining_capacity"
             tags "LogicalEntity"
         }
 
@@ -374,12 +382,12 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         }
 
         ldmReservation = element "Reservation [Logical]" {
-            description "PK: reservation_id | FK: ticket_type_id | FK: attendee_id | reservation_status | reservation_expiry"
+            description "PK: reservation_id | FK: ticket_type_id | FK: purchase_id | reservation_status | reservation_expiry"
             tags "LogicalEntity"
         }
 
         ldmPurchase = element "Purchase [Logical]" {
-            description "PK: purchase_id | FK: reservation_id | FK: attendee_id"
+            description "PK: purchase_id | FK: attendee_id | purchase_status"
             tags "LogicalEntity"
         }
 
@@ -389,7 +397,12 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         }
 
         ldmTicket = element "Ticket [Logical]" {
-            description "PK: ticket_id | FK: ticket_type_id | FK: purchase_id | FK: attendee_id | ticket_code | ticket_status | validation_status | admission_timestamp"
+            description "PK: ticket_id | FK: ticket_type_id | FK: purchase_id | FK: attendee_id | ticket_code | ticket_status"
+            tags "LogicalEntity"
+        }
+
+        ldmValidationAdmission = element "Validation / Admission [Logical]" {
+            description "PK: validation_id | FK: ticket_id | validation_status | admission_timestamp"
             tags "LogicalEntity"
         }
 
@@ -404,13 +417,14 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         ldmTicketType -> ldmReservation "1 : 0..*"
         ldmTicketType -> ldmTicket "1 : 0..*"
 
-        ldmAttendee -> ldmReservation "1 : 0..*"
         ldmAttendee -> ldmPurchase "1 : 0..*"
         ldmAttendee -> ldmTicket "1 : 0..*"
 
-        ldmReservation -> ldmPurchase "1 : 0..1"
+        ldmPurchase -> ldmReservation "1 : 0..*"
         ldmPurchase -> ldmPayment "1 : 0..1"
         ldmPurchase -> ldmTicket "1 : 0..*"
+
+        ldmTicket -> ldmValidationAdmission "1 : 0..*"
 
 
         // =========================================================
@@ -422,12 +436,12 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         // =========================================================
 
         pdmEvents = element "events [Physical]" {
-            description "event_id INTEGER (PK)\nevent_name VARCHAR(150)\nevent_content VARCHAR(255)\nevent_capacity INTEGER\nremaining_capacity INTEGER"
+            description "event_id INTEGER (PK)\nevent_name VARCHAR(150)\nevent_content VARCHAR(255)\nevent_capacity INTEGER"
             tags "PhysicalTable"
         }
 
         pdmTicketTypes = element "ticket_types [Physical]" {
-            description "ticket_type_id INTEGER (PK)\nevent_id INTEGER (FK)\nticket_type VARCHAR(50)\nticket_price DECIMAL(10,2)"
+            description "ticket_type_id INTEGER (PK)\nevent_id INTEGER (FK)\nticket_type_name VARCHAR(100)\nticket_price DECIMAL(10,2)\nremaining_capacity INTEGER"
             tags "PhysicalTable"
         }
 
@@ -442,12 +456,12 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         }
 
         pdmReservations = element "reservations [Physical]" {
-            description "reservation_id INTEGER (PK)\nticket_type_id INTEGER (FK)\nattendee_id INTEGER (FK)\nreservation_status VARCHAR(20)\nreservation_expiry TIMESTAMP"
+            description "reservation_id INTEGER (PK)\nticket_type_id INTEGER (FK)\npurchase_id INTEGER (FK)\nreservation_status VARCHAR(20)\nreservation_expiry TIMESTAMP"
             tags "PhysicalTable"
         }
 
         pdmPurchases = element "purchases [Physical]" {
-            description "purchase_id INTEGER (PK)\nreservation_id INTEGER (FK)\nattendee_id INTEGER (FK)"
+            description "purchase_id INTEGER (PK)\nattendee_id INTEGER (FK)\npurchase_status VARCHAR(20)"
             tags "PhysicalTable"
         }
 
@@ -457,7 +471,12 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         }
 
         pdmTickets = element "tickets [Physical]" {
-            description "ticket_id INTEGER (PK)\nticket_type_id INTEGER (FK)\npurchase_id INTEGER (FK)\nattendee_id INTEGER (FK)\nticket_code VARCHAR(100)\nticket_status VARCHAR(20)\nvalidation_status VARCHAR(20)\nadmission_timestamp TIMESTAMP"
+            description "ticket_id INTEGER (PK)\nticket_type_id INTEGER (FK)\npurchase_id INTEGER (FK)\nattendee_id INTEGER (FK)\nticket_code VARCHAR(100)\nticket_status VARCHAR(20)"
+            tags "PhysicalTable"
+        }
+
+        pdmValidationAdmissions = element "validation_admissions [Physical]" {
+            description "validation_id INTEGER (PK)\nticket_id INTEGER (FK)\nvalidation_status VARCHAR(20)\nadmission_timestamp TIMESTAMP"
             tags "PhysicalTable"
         }
 
@@ -472,13 +491,14 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         pdmTicketTypes -> pdmReservations "ticket_type_id FK"
         pdmTicketTypes -> pdmTickets "ticket_type_id FK"
 
-        pdmAttendees -> pdmReservations "attendee_id FK"
         pdmAttendees -> pdmPurchases "attendee_id FK"
         pdmAttendees -> pdmTickets "attendee_id FK"
 
-        pdmReservations -> pdmPurchases "reservation_id FK"
+        pdmPurchases -> pdmReservations "purchase_id FK"
         pdmPurchases -> pdmPayments "purchase_id FK"
         pdmPurchases -> pdmTickets "purchase_id FK"
+
+        pdmTickets -> pdmValidationAdmissions "ticket_id FK"
 
 
         // =========================================================
@@ -833,6 +853,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             include cdmPurchase
             include cdmPaymentTransaction
             include cdmTicket
+            include cdmValidationAdmission
 
             autoLayout tb
         }
@@ -853,6 +874,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             include ldmPurchase
             include ldmPayment
             include ldmTicket
+            include ldmValidationAdmission
 
             autoLayout tb
         }
@@ -877,6 +899,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             include pdmPurchases
             include pdmPayments
             include pdmTickets
+            include pdmValidationAdmissions
 
             autoLayout lr
         }
