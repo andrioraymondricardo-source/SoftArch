@@ -41,7 +41,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         // =========================================================
 
         ems = softwareSystem "Event Management and Ticketing System" {
-            description "Supports event creation, promotion, ticketing, payment, analytics, ticket scanning, and attendee management."
+            description "Supports event creation, promotion, ticketing, payment, analytics, ticket scanning, attendee management, and multimedia event content."
 
 
             // =====================================================
@@ -58,7 +58,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
                 }
 
                 ticketPurchaseUI = component "Ticket Purchase UI" {
-                    description "Allows ticket buyers to select tickets, initiate purchases, and access purchased digital tickets."
+                    description "Allows ticket buyers to select tickets, initiate purchases, and access purchased digital tickets including QR codes."
                     technology "Web UI Component"
                 }
 
@@ -68,7 +68,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
                 }
 
                 eventPageContentUI = component "Event Page Content UI" {
-                    description "Allows event organisers to manage customisable event page content and multimedia elements."
+                    description "Allows event organisers to manage customisable event page content, images, videos, posters, and other multimedia elements."
                     technology "Web UI Component"
                 }
 
@@ -103,7 +103,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
                 technology "Mobile Application"
 
                 ticketScannerUI = component "Ticket Scanner UI" {
-                    description "Allows event staff to scan a digital ticket and capture its ticket identifier."
+                    description "Allows event staff to scan a digital ticket QR code and capture its ticket identifier."
                     technology "Mobile UI Component"
                 }
 
@@ -129,11 +129,16 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             // =====================================================
 
             backendApi = container "Backend API" {
-                description "Executes business logic for event management, ticket purchasing, pricing and promotions, capacity management, payments, ticket validation, and analytics."
+                description "Executes business logic for event management, ticket purchasing, pricing and promotions, capacity management, payments, ticket validation, QR generation, and analytics."
                 technology "Application / API"
 
+
+                // =================================================
+                // LEVEL 3 - BACKEND COMPONENTS
+                // =================================================
+
                 eventManagementComponent = component "Event Management Component" {
-                    description "Manages event creation, customisable event pages, multimedia content, updates, ticket types, and event configuration."
+                    description "Manages event creation, customisable event pages, multimedia metadata, updates, ticket types, and event configuration."
                     technology "Application Component"
                 }
 
@@ -143,7 +148,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
                 }
 
                 ticketManagementComponent = component "Ticket Management Component" {
-                    description "Handles ticket purchase requests, ticket issuance, and retrieval of purchased tickets."
+                    description "Handles ticket purchase requests, unique ticket code generation, ticket issuance, and retrieval of purchased tickets."
                     technology "Application Component"
                 }
 
@@ -158,12 +163,17 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
                 }
 
                 ticketValidationComponent = component "Ticket Validation Component" {
-                    description "Validates scanned tickets, detects invalid or previously used tickets, and records attendee admission."
+                    description "Validates scanned ticket codes, detects invalid or previously used tickets, and records attendee admission."
                     technology "Application Component"
                 }
 
+                qrCodeGenerator = component "QR Code Generator" {
+                    description "Encodes the stored ticket code into a QR code for display on the digital ticket. The generated QR image does not need to be persistently stored."
+                    technology "QR Generation Component"
+                }
+
                 analyticsComponent = component "Analytics Component" {
-                    description "Provides post-event sales, ticketing, and attendee analytics using analytical data."
+                    description "Provides post-event sales, ticketing, payment, and attendee analytics using analytical data."
                     technology "Application Component"
                 }
 
@@ -180,7 +190,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
                 group "Services" {
 
                     ticketManagementService = component "Ticket Management Service" {
-                        description "Methods: purchaseTicket(), issueTicket(), handlePaymentResult()."
+                        description "Methods: purchaseTicket(), issueTicket(), generateTicketCode(), handlePaymentResult()."
                         technology "Service"
                     }
 
@@ -258,7 +268,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             // =====================================================
 
             emsDatabase = container "EMS Database" {
-                description "Stores operational event, ticket, reservation, purchase, payment, promotion, and admission data with transactional consistency."
+                description "Stores structured operational event, media metadata, ticket, reservation, purchase, payment, promotion, and admission data with transactional consistency."
                 technology "Relational Database"
                 tags "Database"
             }
@@ -269,7 +279,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             // =====================================================
 
             analyticsETL = container "Analytics ETL / Batch Processor" {
-                description "Periodically extracts operational EMS data, transforms it for analytics, and loads it into the Analytics Data Warehouse."
+                description "Periodically extracts structured operational EMS data, transforms it for analytics, and loads it into the Analytics Data Warehouse."
                 technology "Batch / ETL"
                 tags "ETL"
             }
@@ -283,6 +293,17 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
                 description "Stores structured historical sales, ticketing, payment, and attendance data for post-event analytical workloads."
                 technology "Analytics Data Warehouse"
                 tags "DataWarehouse"
+            }
+
+
+            // =====================================================
+            // UNSTRUCTURED MEDIA STORAGE - DAD-05
+            // =====================================================
+
+            objectStorage = container "Object Storage" {
+                description "Stores unstructured event images, videos, posters, and promotional media. The EMS Database stores only media metadata and references."
+                technology "Object Storage"
+                tags "ObjectStorage"
             }
         }
 
@@ -303,6 +324,11 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         cdmPromotion = element "Promotion" "Conceptual Entity" {
             description "Represents pricing discounts or promotional information associated with an event."
+            tags "ConceptualEntity"
+        }
+
+        cdmEventMedia = element "Event Media" "Conceptual Entity" {
+            description "Represents images, videos, posters, and promotional media associated with an event."
             tags "ConceptualEntity"
         }
 
@@ -343,6 +369,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         cdmEvent -> cdmTicketType "1 : 0..*"
         cdmEvent -> cdmPromotion "1 : 0..*"
+        cdmEvent -> cdmEventMedia "1 : 0..*"
 
         cdmTicketType -> cdmTicket "1 : 0..*"
         cdmTicketType -> cdmReservation "1 : 0..*"
@@ -373,6 +400,11 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         ldmPromotion = element "Promotion [Logical]" {
             description "PK: promotion_id | FK: event_id | promotion_details"
+            tags "LogicalEntity"
+        }
+
+        ldmEventMedia = element "Event Media [Logical]" {
+            description "PK: media_id | FK: event_id | media_type | media_reference"
             tags "LogicalEntity"
         }
 
@@ -413,6 +445,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         ldmEvent -> ldmTicketType "1 : 0..*"
         ldmEvent -> ldmPromotion "1 : 0..*"
+        ldmEvent -> ldmEventMedia "1 : 0..*"
 
         ldmTicketType -> ldmReservation "1 : 0..*"
         ldmTicketType -> ldmTicket "1 : 0..*"
@@ -431,10 +464,6 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         // PHYSICAL DATA MODEL
         // =========================================================
 
-        // =========================================================
-        // PHYSICAL DATA MODEL
-        // =========================================================
-
         pdmEvents = element "events [Physical]" {
             description "event_id INTEGER (PK)\nevent_name VARCHAR(150)\nevent_content VARCHAR(255)\nevent_capacity INTEGER"
             tags "PhysicalTable"
@@ -447,6 +476,11 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         pdmPromotions = element "promotions [Physical]" {
             description "promotion_id INTEGER (PK)\nevent_id INTEGER (FK)\npromotion_details VARCHAR(255)"
+            tags "PhysicalTable"
+        }
+
+        pdmEventMedia = element "event_media [Physical]" {
+            description "media_id INTEGER (PK)\nevent_id INTEGER (FK)\nmedia_type VARCHAR(20)\nmedia_reference VARCHAR(500)"
             tags "PhysicalTable"
         }
 
@@ -487,6 +521,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         pdmEvents -> pdmTicketTypes "event_id FK"
         pdmEvents -> pdmPromotions "event_id FK"
+        pdmEvents -> pdmEventMedia "event_id FK"
 
         pdmTicketTypes -> pdmReservations "ticket_type_id FK"
         pdmTicketTypes -> pdmTickets "ticket_type_id FK"
@@ -517,6 +552,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         ems -> socialMediaService "Publishes event promotional content using"
 
+
         // =========================================================
         // LEVEL 2 RELATIONSHIPS
         // =========================================================
@@ -533,7 +569,9 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         mobileApplication -> backendApi "Makes ticket validation and admission requests to" "REST/HTTPS"
 
-        backendApi -> emsDatabase "Reads and writes operational event, ticket, reservation, purchase, payment, and attendee data" "Transactional database access"
+        backendApi -> emsDatabase "Reads and writes structured operational data and media metadata" "Transactional database access"
+
+        backendApi -> objectStorage "Stores and retrieves unstructured event and promotional media" "Object storage access"
 
         backendApi -> paymentProvider "Sends payment requests and receives payment status from" "External API/HTTPS"
 
@@ -542,10 +580,10 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         // =========================================================
         // DATA ARCHITECTURE RELATIONSHIPS
-        // DAD-02 + DAD-03
+        // DAD-02 + DAD-03 + DAD-05
         // =========================================================
 
-        emsDatabase -> analyticsETL "Provides operational sales, ticketing, payment, and attendance data for periodic extraction" "Batch extraction"
+        emsDatabase -> analyticsETL "Provides structured sales, ticketing, payment, and attendance data for periodic extraction" "Batch extraction"
 
         analyticsETL -> analyticsWarehouse "Transforms and loads historical analytical data into" "Batch / ETL"
 
@@ -558,7 +596,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         ticketBuyer -> eventBrowsingUI "Browses events using"
 
-        ticketBuyer -> ticketPurchaseUI "Purchases and accesses tickets using"
+        ticketBuyer -> ticketPurchaseUI "Purchases and accesses digital tickets using"
 
         eventOrganiser -> eventManagementUI "Creates and manages events using"
 
@@ -591,11 +629,11 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         // LEVEL 3 RELATIONSHIPS - MOBILE APPLICATION
         // =========================================================
 
-        eventStaff -> ticketScannerUI "Scans attendee tickets using"
+        eventStaff -> ticketScannerUI "Scans attendee ticket QR codes using"
 
         eventStaff -> admissionManagementUI "Manages attendee admission using"
 
-        ticketScannerUI -> ticketValidationUI "Provides scanned ticket identifier to"
+        ticketScannerUI -> ticketValidationUI "Provides scanned ticket code to"
 
         ticketValidationUI -> mobileApiClient "Submits ticket validation requests through"
 
@@ -608,7 +646,9 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         // LEVEL 3 RELATIONSHIPS - BACKEND API
         // =========================================================
 
-        eventManagementComponent -> emsDatabase "Reads and writes event, event page, multimedia content, and configuration data" "Transactional database access"
+        eventManagementComponent -> emsDatabase "Reads and writes event, media metadata, and configuration data" "Transactional database access"
+
+        eventManagementComponent -> objectStorage "Stores and retrieves event images, videos, posters, and promotional media" "Object storage access"
 
         pricingPromotionComponent -> emsDatabase "Reads and writes pricing, discount, and promotion data" "Transactional database access"
 
@@ -620,7 +660,11 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         ticketManagementComponent -> paymentProcessingComponent "Requests payment processing"
 
-        ticketManagementComponent -> emsDatabase "Reads and writes ticket and purchase data" "Transactional database access"
+        ticketManagementComponent -> qrCodeGenerator "Requests QR code generation using the stored ticket code"
+
+        ticketManagementComponent -> emsDatabase "Reads and writes ticket and purchase data including ticket codes" "Transactional database access"
+
+        qrCodeGenerator -> ticketManagementComponent "Returns generated QR code for digital ticket display"
 
         capacityReservationComponent -> emsDatabase "Atomically checks and updates ticket capacity and reservation state" "Transactional database access"
 
@@ -630,7 +674,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         paymentProcessingComponent -> emsDatabase "Records payment transaction status" "Transactional database access"
 
-        ticketValidationComponent -> emsDatabase "Validates ticket status and records attendee admission" "Transactional database access"
+        ticketValidationComponent -> emsDatabase "Validates ticket code and status and records validation and admission data" "Transactional database access"
 
         administrationComponent -> emsDatabase "Reads operational, ticket, and payment data for monitoring" "Database access"
 
@@ -653,7 +697,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         paymentProcessingService -> capacityReservationService "Success: confirm; failure: release"
 
-        ticketManagementService -> ticketRepository "Issues ticket after successful payment"
+        ticketManagementService -> ticketRepository "Issues ticket and stores unique ticket code after successful payment"
 
         ticketRepository -> ticketEntity "Persists"
 
@@ -664,6 +708,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         ticketRepository -> eventEntity "Reads event data"
 
         ticketRepository -> attendeeEntity "Reads attendee data"
+
     }
 
 
@@ -777,10 +822,12 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             include capacityReservationComponent
             include paymentProcessingComponent
             include ticketValidationComponent
+            include qrCodeGenerator
             include analyticsComponent
             include administrationComponent
 
             include emsDatabase
+            include objectStorage
             include analyticsWarehouse
 
             include paymentProvider
@@ -817,26 +864,21 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         // =========================================================
         // 7. C4 - DATA ARCHITECTURE
-        //
-        // Uses a custom view so that the operational and analytical
-        // data architecture can be shown together explicitly.
         // =========================================================
 
         container ems "07-DataArchitecture" {
-
             title "7. C4 - Data Architecture"
 
-            include webApplication
-            include mobileApplication
             include backendApi
             include emsDatabase
+            include objectStorage
             include analyticsETL
             include analyticsWarehouse
             include paymentProvider
 
             autoLayout lr
-
         }
+
 
         // =========================================================
         // 8. CONCEPTUAL DATA MODEL
@@ -848,6 +890,8 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             include cdmEvent
             include cdmTicketType
             include cdmPromotion
+            include cdmEventMedia
+
             include cdmAttendee
             include cdmReservation
             include cdmPurchase
@@ -869,6 +913,8 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             include ldmEvent
             include ldmTicketType
             include ldmPromotion
+            include ldmEventMedia
+
             include ldmAttendee
             include ldmReservation
             include ldmPurchase
@@ -882,10 +928,6 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         // =========================================================
         // 10. PHYSICAL DATA MODEL
-        //
-        // No autoLayout.
-        // This allows the diagram to be manually arranged in
-        // Structurizr to minimise crossing relationship lines.
         // =========================================================
 
         custom "10-PhysicalDataModel" {
@@ -894,6 +936,8 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             include pdmEvents
             include pdmTicketTypes
             include pdmPromotions
+            include pdmEventMedia
+
             include pdmAttendees
             include pdmReservations
             include pdmPurchases
@@ -907,9 +951,6 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         // =========================================================
         // LOCAL STYLES
-        //
-        // These styles do not require the remote Structurizr
-        // default theme to be downloaded.
         // =========================================================
 
         styles {
@@ -933,6 +974,30 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             element "Component" {
                 background #85bbf0
                 color #000000
+            }
+
+            element "Database" {
+                shape Cylinder
+                background #438dd5
+                color #ffffff
+            }
+
+            element "DataWarehouse" {
+                shape Cylinder
+                background #438dd5
+                color #ffffff
+            }
+
+            element "ETL" {
+                shape RoundedBox
+                background #85bbf0
+                color #000000
+            }
+
+            element "ObjectStorage" {
+                shape Cylinder
+                background #438dd5
+                color #ffffff
             }
 
             element "ConceptualEntity" {

@@ -1,0 +1,86 @@
+erDiagram
+
+    EVENT {
+        INTEGER event_id PK
+        VARCHAR event_name
+        VARCHAR event_content
+        INTEGER event_capacity
+    }
+
+    TICKET_TYPE {
+        INTEGER ticket_type_id PK
+        INTEGER event_id FK
+        VARCHAR ticket_type_name
+        DECIMAL ticket_price
+        INTEGER remaining_capacity
+    }
+
+    PROMOTION {
+        INTEGER promotion_id PK
+        INTEGER event_id FK
+        VARCHAR promotion_details
+    }
+
+    EVENT_MEDIA {
+        INTEGER media_id PK
+        INTEGER event_id FK
+        VARCHAR media_type
+        VARCHAR media_reference
+    }
+
+    ATTENDEE {
+        INTEGER attendee_id PK
+    }
+
+    PURCHASE {
+        INTEGER purchase_id PK
+        INTEGER attendee_id FK
+        VARCHAR purchase_status
+    }
+
+    RESERVATION {
+        INTEGER reservation_id PK
+        INTEGER ticket_type_id FK
+        INTEGER purchase_id FK
+        VARCHAR reservation_status
+        DATETIME reservation_expiry
+    }
+
+    PAYMENT_TRANSACTION {
+        VARCHAR payment_transaction_id PK
+        INTEGER purchase_id FK
+        VARCHAR payment_status
+    }
+
+    TICKET {
+        INTEGER ticket_id PK
+        INTEGER ticket_type_id FK
+        INTEGER purchase_id FK
+        INTEGER attendee_id FK
+        VARCHAR ticket_code
+        VARCHAR ticket_status
+    }
+
+    VALIDATION_ADMISSION {
+        INTEGER validation_id PK
+        INTEGER ticket_id FK
+        VARCHAR validation_status
+        DATETIME admission_timestamp
+    }
+
+
+    EVENT ||--o{ TICKET_TYPE : "has"
+    EVENT ||--o{ PROMOTION : "has"
+    EVENT ||--o{ EVENT_MEDIA : "has media"
+
+    TICKET_TYPE ||--o{ RESERVATION : "reserved through"
+    TICKET_TYPE ||--o{ TICKET : "defines"
+
+    ATTENDEE ||--o{ PURCHASE : "makes"
+    ATTENDEE ||--o{ TICKET : "owns"
+
+    PURCHASE ||--o{ RESERVATION : "confirms"
+    PURCHASE ||--o| PAYMENT_TRANSACTION : "has"
+    PURCHASE ||--o{ TICKET : "produces"
+
+    TICKET ||--o{ VALIDATION_ADMISSION : "has validation records"
