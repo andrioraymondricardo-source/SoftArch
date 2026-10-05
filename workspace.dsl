@@ -297,6 +297,17 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
 
             // =====================================================
+            // BACKUP AND RECOVERY - DAD-04
+            // =====================================================
+
+            backupRecovery = container "Backup & Recovery" {
+                description "Stores regular backups of critical EMS operational data and supports point-in-time recovery after data loss or database failure."
+                technology "Database Backup / Point-in-Time Recovery"
+                tags "Backup"
+            }
+
+
+            // =====================================================
             // UNSTRUCTURED MEDIA STORAGE - DAD-05
             // =====================================================
 
@@ -580,7 +591,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         // =========================================================
         // DATA ARCHITECTURE RELATIONSHIPS
-        // DAD-02 + DAD-03 + DAD-05
+        // DAD-02 + DAD-03 + DAD-04 + DAD-05
         // =========================================================
 
         emsDatabase -> analyticsETL "Provides structured sales, ticketing, payment, and attendance data for periodic extraction" "Batch extraction"
@@ -588,6 +599,8 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         analyticsETL -> analyticsWarehouse "Transforms and loads historical analytical data into" "Batch / ETL"
 
         analyticsComponent -> analyticsWarehouse "Reads post-event sales, ticketing, payment, and attendance data from" "Analytical query"
+
+        emsDatabase -> backupRecovery "Creates regular backups and point-in-time recovery data for" "Backup / PITR"
 
 
         // =========================================================
@@ -872,6 +885,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             include backendApi
             include emsDatabase
             include objectStorage
+            include backupRecovery
             include analyticsETL
             include analyticsWarehouse
             include paymentProvider
@@ -992,6 +1006,12 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
                 shape RoundedBox
                 background #85bbf0
                 color #000000
+            }
+
+            element "Backup" {
+                shape Cylinder
+                background #438dd5
+                color #ffffff
             }
 
             element "ObjectStorage" {
