@@ -316,6 +316,17 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
                 technology "Object Storage"
                 tags "ObjectStorage"
             }
+
+            // PR3 CLOUD SERVICES
+            apiGateway = container "API Gateway" {
+                description "Protects public API entry points with rate limits and routes requests to the private backend."
+                technology "Managed API Gateway / PaaS"
+            }
+
+            identityService = container "Identity Service" {
+                description "Authenticates users and issues signed tokens. Backend API enforces application permissions."
+                technology "Managed identity / IDaaS"
+            }
         }
 
 
@@ -574,7 +585,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
         administrator -> webApplication "Monitors system operations and suspicious activity using" "HTTPS"
 
-        eventStaff -> mobileApplication "Scans tickets and manages attendee admission using" "HTTPS"
+        eventStaff -> mobileApplication "Scans tickets and manages attendee admission using" "Local interaction"
 
         webApplication -> backendApi "Makes API requests to" "REST/HTTPS"
 
@@ -721,6 +732,107 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         ticketRepository -> eventEntity "Reads event data"
 
         ticketRepository -> attendeeEntity "Reads attendee data"
+
+
+        // PR3 CLOUD RELATIONSHIPS
+        webApplication -> apiGateway "Sends authenticated API requests" "REST/HTTPS"
+        mobileApplication -> apiGateway "Sends authenticated ticket validation requests" "REST/HTTPS"
+
+        apiGateway -> backendApi "Routes requests; backend verifies authentication and permissions" "HTTPS"
+
+        webApplication -> identityService "Authenticates users" "OIDC/HTTPS"
+        identityService -> webApplication "Returns authentication results and tokens" "HTTPS"
+        mobileApplication -> identityService "Authenticates event staff" "OIDC/HTTPS"
+
+        backendApi -> identityService "Obtains public signing keys" "HTTPS"
+
+        paymentProvider -> apiGateway "Sends authenticated payment callbacks" "HTTPS"
+
+                deploymentEnvironment "Proposed Cloud" {
+
+            deploymentNode "User Devices" "Outside the managed cloud." "Client devices" {
+
+                deploymentNode "Web Browser" "Runs the web interface." "Browser" {
+                    browserInstance = containerInstance webApplication
+                }
+
+                deploymentNode "Staff Device" "Runs the mobile application." "Mobile OS" {
+                    mobileInstance = containerInstance mobileApplication
+                }
+            }
+
+            deploymentNode "Managed Cloud Platform" "Proposed cloud deployment." "Cloud services" {
+
+                deploymentNode "Public Edge" "Public web delivery and protected API ingress." "Managed edge services" {
+
+                    webDelivery = infrastructureNode "Web Hosting / CDN" "Delivers static web assets." "Managed web hosting / CDN"
+
+                    waf = infrastructureNode "WAF / DDoS Protection" "Filters malicious public requests." "Managed security"
+
+                    gatewayInstance = containerInstance apiGateway
+                }
+
+                deploymentNode "Private Application Tier" "Backend replicas with load balancing and autoscaling." "CaaS" {
+                    instances 2
+                    apiInstance = containerInstance backendApi
+                }
+
+                deploymentNode "Protected Data Tier" "Restricted database access with encrypted connections and storage." "DBaaS" {
+                    databaseInstance = containerInstance emsDatabase
+                }
+            }
+
+            deploymentNode "External Provider Environment" "Separate payment-provider trust domain." "External services" {
+                paymentInstance = softwareSystemInstance paymentProvider
+            }
+
+            webDelivery -> browserInstance "Delivers web assets" "HTTPS"
+
+            browserInstance -> waf "Sends public API requests" "HTTPS"
+            mobileInstance -> waf "Sends validation requests" "HTTPS"
+            paymentInstance -> waf "Sends authenticated callbacks" "HTTPS"
+
+            waf -> gatewayInstance "Passes permitted traffic" "HTTPS"
+        }
+
+            deploymentEnvironment "Cloud Overview" {
+
+                deploymentNode "User Devices" "Web and mobile clients." "Client devices" {
+                    overviewWeb = containerInstance webApplication {
+                        tags "OverviewInstance"
+                    }
+
+                    overviewMobile = containerInstance mobileApplication {
+                        tags "OverviewInstance"
+                    }
+
+                    tags "OverviewBoundary"
+                }
+
+                deploymentNode "Managed Cloud" "Protected ingress, private backend and encrypted database." "CaaS / DBaaS" {
+                    overviewGateway = containerInstance apiGateway {
+                        tags "OverviewInstance"
+                    }
+
+                    overviewBackend = containerInstance backendApi {
+                        tags "OverviewInstance"
+                    }
+
+                    overviewDatabase = containerInstance emsDatabase {
+                        tags "OverviewInstance"
+                    }
+
+                    tags "OverviewBoundary"
+                }
+
+                deploymentNode "External Payment Service" "Separate provider trust domain." "External service" {
+                    overviewPayment = softwareSystemInstance paymentProvider {
+                        tags "OverviewInstance"
+                    }
+
+                    tags "OverviewBoundary"
+                }
+            }
 
     }
 
@@ -983,6 +1095,61 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             autoLayout lr
         }
 
+        // =========================================================
+        // 12. CLOUD AND SECURITY OVERVIEW — unchanged
+        // =========================================================
+
+        container ems "12-CloudSecurityArchitecture" {
+            title "12. Cloud and Security Architecture"
+
+            include webApplication
+            include mobileApplication
+            include apiGateway
+            include backendApi
+            include identityService
+            include emsDatabase
+            include paymentProvider
+
+            exclude "relationship==webApplication->backendApi"
+            exclude "relationship==mobileApplication->backendApi"
+            exclude "relationship==paymentProvider->backendApi"
+
+            // Hide the token-return arrow to reduce crossing lines.
+            exclude "relationship==identityService->webApplication"
+
+            autoLayout lr
+        }
+
+
+        // =========================================================
+        // 13. CORE CLOUD DEPLOYMENT — horizontal layout
+        // =========================================================
+        deployment * "Cloud Overview" "13-CloudDeployment" {
+            title "13. Cloud Deployment Overview"
+
+            include *
+
+            exclude "relationship==overviewWeb->overviewBackend"
+            exclude "relationship==overviewMobile->overviewBackend"
+            exclude "relationship==overviewPayment->overviewBackend"
+
+            autoLayout lr
+        }
+
+        // =========================================================
+        // 14. TICKET VALIDATION FLOW — horizontal layout
+        // =========================================================
+
+        dynamic ems "14-SecureTicketValidation" {
+            title "14. Secure Ticket Validation Flow"
+
+            1: eventStaff -> mobileApplication "Scans ticket QR code locally"
+            2: mobileApplication -> apiGateway "EP4: sends token, event ID and ticket code"
+            3: apiGateway -> backendApi "Forwards request; backend checks token and staff permissions"
+            4: backendApi -> emsDatabase "Atomically validates ticket, marks it used and records admission"
+
+            autoLayout lr
+        }
 
         // =========================================================
         // LOCAL STYLES
@@ -1065,6 +1232,23 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             relationship "Relationship" {
                 color #707070
                 thickness 2
+            }
+
+            element "OverviewInstance" {
+                width 420
+                height 360
+                fontSize 20
+                metadata false
+                description true
+            }   
+
+            element "OverviewBoundary" {
+                background #f5f7fa
+                color #263238
+                stroke #607d8b
+                fontSize 20
+                metadata false
+                description true
             }
         }
     }
