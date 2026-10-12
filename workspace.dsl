@@ -962,6 +962,27 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             autoLayout lr
         }
 
+        // =========================================================
+        // 11. DYNAMIC SECURITY DATA FLOW
+        // =========================================================
+
+        dynamic ems "11-SecurityDataFlow" {
+            title "11. Dynamic Security Data Flow"
+
+            1: ticketBuyer -> webApplication "Submits login and ticket purchase request"
+            2: webApplication -> backendApi "Sends authenticated purchase request via HTTPS"
+            3: backendApi -> emsDatabase "Checks capacity and stores reservation and purchase data"
+            4: backendApi -> paymentProvider "Sends payment request via HTTPS"
+            5: paymentProvider -> backendApi "Returns payment result via HTTPS"
+            
+            6: backendApi -> emsDatabase "Records payment result and updates ticket/reservation state"
+            7: eventStaff -> mobileApplication "Scans attendee ticket QR code"
+            8: mobileApplication -> backendApi "Submits ticket validation request via HTTPS"
+            9: backendApi -> emsDatabase "Validates ticket status and records admission"
+
+            autoLayout lr
+        }
+
 
         // =========================================================
         // LOCAL STYLES
