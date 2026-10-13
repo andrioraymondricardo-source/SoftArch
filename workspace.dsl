@@ -797,7 +797,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
 
             deploymentEnvironment "Cloud Overview" {
 
-                deploymentNode "User Devices" "Web and mobile clients." "Client devices" {
+                deploymentNode "User Devices" "Web and mobile clients outside the managed cloud." "Client devices" {
                     overviewWeb = containerInstance webApplication {
                         tags "OverviewInstance"
                     }
@@ -809,29 +809,58 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
                     tags "OverviewBoundary"
                 }
 
-                deploymentNode "Managed Cloud" "Protected ingress, private backend and encrypted database." "CaaS / DBaaS" {
-                    overviewGateway = containerInstance apiGateway {
-                        tags "OverviewInstance"
+                deploymentNode "Managed Cloud" "Protected ingress, private backend, cloud storage, backup and encrypted database." "Managed cloud services" {
+
+                    deploymentNode "Public Edge" "Public web delivery and protected API ingress." "Managed edge services" {
+                        overviewWebDelivery = infrastructureNode "Web Hosting / CDN" "Delivers static web assets and event pages." "Managed web hosting / CDN"
+
+                        overviewWaf = infrastructureNode "WAF / DDoS Protection" "Filters malicious public requests and protects API entry points." "Managed security"
+
+                        overviewGateway = containerInstance apiGateway {
+                            tags "OverviewInstance"
+                        }
                     }
 
-                    overviewBackend = containerInstance backendApi {
-                        tags "OverviewInstance"
+                    deploymentNode "Private Application Tier" "Backend replicas with load balancing and autoscaling." "PaaS / CaaS" {
+                        instances 2
+
+                        overviewBackend = containerInstance backendApi {
+                            tags "OverviewInstance"
+                        }
                     }
 
-                    overviewDatabase = containerInstance emsDatabase {
-                        tags "OverviewInstance"
+                    deploymentNode "Protected Storage Tier" "Restricted storage access with encrypted connections and managed recovery." "DBaaS / STaaS / Backup" {
+                        overviewDatabase = containerInstance emsDatabase {
+                            tags "OverviewInstance"
+                        }
+
+                        overviewObjectStorage = containerInstance objectStorage {
+                            tags "OverviewInstance"
+                        }
+
+                        overviewBackup = containerInstance backupRecovery {
+                            tags "OverviewInstance"
+                        }
                     }
 
                     tags "OverviewBoundary"
                 }
 
-                deploymentNode "External Payment Service" "Separate provider trust domain." "External service" {
+                deploymentNode "External Payment Service" "Separate payment-provider trust domain." "External service" {
                     overviewPayment = softwareSystemInstance paymentProvider {
                         tags "OverviewInstance"
                     }
 
                     tags "OverviewBoundary"
                 }
+
+                overviewWebDelivery -> overviewWeb "Delivers web assets" "HTTPS"
+                overviewWeb -> overviewWaf "Sends authenticated API requests" "HTTPS"
+                overviewMobile -> overviewWaf "Sends ticket validation requests" "HTTPS"
+                overviewPayment -> overviewWaf "Sends authenticated payment callbacks" "HTTPS"
+                overviewWaf -> overviewGateway "Passes permitted traffic" "HTTPS"
+                // Relationships between container/software system instances are derived from model-level relationships.
+                // Do not define containerInstance -> containerInstance relationships here.
             }
 
     }
@@ -1082,15 +1111,17 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             title "11. Dynamic Security Data Flow"
 
             1: ticketBuyer -> webApplication "Submits login and ticket purchase request"
-            2: webApplication -> backendApi "Sends authenticated purchase request via HTTPS"
-            3: backendApi -> emsDatabase "Checks capacity and stores reservation and purchase data"
-            4: backendApi -> paymentProvider "Sends payment request via HTTPS"
-            5: paymentProvider -> backendApi "Returns payment result via HTTPS"
-            
-            6: backendApi -> emsDatabase "Records payment result and updates ticket/reservation state"
-            7: eventStaff -> mobileApplication "Scans attendee ticket QR code"
-            8: mobileApplication -> backendApi "Submits ticket validation request via HTTPS"
-            9: backendApi -> emsDatabase "Validates ticket status and records admission"
+            2: webApplication -> apiGateway "Sends authenticated purchase request via HTTPS"
+            3: apiGateway -> backendApi "Routes purchase request; backend verifies authentication and permissions"
+            4: backendApi -> emsDatabase "Checks capacity and stores reservation and purchase data"
+            5: backendApi -> paymentProvider "Sends payment request via HTTPS"
+            6: paymentProvider -> apiGateway "Returns authenticated payment callback via HTTPS"
+            7: apiGateway -> backendApi "Routes payment callback to backend"
+            8: backendApi -> emsDatabase "Records payment result and updates ticket/reservation state"
+            9: eventStaff -> mobileApplication "Scans attendee ticket QR code locally"
+            10: mobileApplication -> apiGateway "Submits ticket validation request via HTTPS"
+            11: apiGateway -> backendApi "Routes validation request; backend verifies token and staff permissions"
+            12: backendApi -> emsDatabase "Validates ticket status and records admission"
 
             autoLayout lr
         }
@@ -1108,6 +1139,8 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             include backendApi
             include identityService
             include emsDatabase
+            include objectStorage
+            include backupRecovery
             include paymentProvider
 
             exclude "relationship==webApplication->backendApi"
@@ -1132,6 +1165,9 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             exclude "relationship==overviewWeb->overviewBackend"
             exclude "relationship==overviewMobile->overviewBackend"
             exclude "relationship==overviewPayment->overviewBackend"
+            exclude "relationship==overviewWeb->overviewGateway"
+            exclude "relationship==overviewMobile->overviewGateway"
+            exclude "relationship==overviewPayment->overviewGateway"
 
             autoLayout lr
         }
@@ -1144,7 +1180,7 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
             title "14. Secure Ticket Validation Flow"
 
             1: eventStaff -> mobileApplication "Scans ticket QR code locally"
-            2: mobileApplication -> apiGateway "EP4: sends token, event ID and ticket code"
+            2: mobileApplication -> apiGateway "EP-04: sends staff token, event ID and ticket code"
             3: apiGateway -> backendApi "Forwards request; backend checks token and staff permissions"
             4: backendApi -> emsDatabase "Atomically validates ticket, marks it used and records admission"
 
