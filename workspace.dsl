@@ -1188,6 +1188,101 @@ workspace "Event Management and Ticketing System" "C4 and data architecture mode
         }
 
         // =========================================================
+        // 15. PR4 - FINAL C4 LEVEL 2 CONTAINER DIAGRAM
+        // =========================================================
+
+        container ems "15-PR4-FinalContainer" {
+
+            title "15. PR4 - Final C4 Level 2 Architecture"
+
+            // People
+            include eventOrganiser
+            include ticketBuyer
+            include eventStaff
+            include administrator
+
+            // Main containers
+            include webApplication
+            include mobileApplication
+            include apiGateway
+            include backendApi
+            include emsDatabase
+
+            // Supporting systems
+            include identityService
+            include paymentProvider
+
+            // Remove legacy direct communication paths
+            exclude "relationship==webApplication->backendApi"
+            exclude "relationship==mobileApplication->backendApi"
+
+            // Reduce unnecessary visual complexity
+            exclude "relationship==identityService->webApplication"
+
+            autoLayout lr
+        }
+
+
+        // =========================================================
+        // 16. PR4 - PURCHASE & PAYMENT DYNAMIC DIAGRAM
+        // Performance vs Consistency
+        // =========================================================
+
+        dynamic ems "16-PR4-PurchasePayment" {
+
+            title "16. PR4 - Purchase & Payment: Performance vs Consistency"
+
+            1: ticketBuyer -> webApplication "Selects tickets and submits purchase request"
+
+            2: webApplication -> apiGateway "Sends authenticated purchase request via HTTPS"
+
+            3: apiGateway -> backendApi "Routes purchase request; backend verifies authentication"
+
+            4: backendApi -> emsDatabase "Atomically checks remaining capacity and creates temporary reservation"
+
+            5: backendApi -> paymentProvider "Requests secure payment processing"
+
+            6: paymentProvider -> apiGateway "Sends signed payment result callback; retries on delivery failure"
+
+            7: apiGateway -> backendApi "Forwards callback for signature and transaction verification"
+
+            8: backendApi -> emsDatabase "Idempotently records verified payment result; confirms or releases reservation based on final payment status"
+
+            9: backendApi -> paymentProvider "If payment status remains uncertain, queries Payment Provider for reconciliation"
+
+            10: backendApi -> emsDatabase "Issues ticket only after confirmed successful payment"
+
+            autoLayout lr
+        }
+
+
+        // =========================================================
+        // 17. PR4 - SECURE TICKET VALIDATION
+        // Security vs Performance
+        // =========================================================
+
+        dynamic ems "17-PR4-TicketValidation" {
+
+            title "17. PR4 - Ticket Validation: Security vs Performance"
+
+            1: eventStaff -> mobileApplication "Scans attendee QR code locally"
+
+            2: mobileApplication -> apiGateway "Sends staff token, event ID and ticket code via HTTPS"
+
+            3: apiGateway -> backendApi "Routes request; backend verifies staff permissions"
+
+            4: backendApi -> emsDatabase "Atomically checks ticket code, event match and unused status; records admission if valid"
+
+            5: emsDatabase -> backendApi "Returns validation result: valid, invalid or already used"
+
+            6: backendApi -> apiGateway "Returns ticket validation response"
+
+            7: apiGateway -> mobileApplication "Returns validation result for display to event staff"
+
+            autoLayout lr
+        }
+
+        // =========================================================
         // LOCAL STYLES
         // =========================================================
 
